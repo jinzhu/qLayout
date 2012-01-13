@@ -36,7 +36,7 @@ var qLayout = (function() {
   ////////////////////////////////////////////////////////////////////////////////
   function doAction(e, action) {
     var elem = (e instanceof HTMLElement) ? e : e.target;
-    e.target.setAttribute("data-qlayout-action", action);
+    elem.setAttribute("data-qlayout-action", action);
   }
 
   function doHoverAction(e) {
@@ -76,14 +76,19 @@ var qLayout = (function() {
   }
 
   function init(elem) {
-    var children = elem.querySelectorAll('[data-qlayout-element]');
-    for (var i=0; i < children.length; i++) {
-      registerAsDarggable(children);
+    function refresh() {
+      var children = elem.querySelectorAll('[data-qlayout-element]');
+      for (var i=0; i < children.length; i++) {
+        registerAsDarggable(children[i]);
+      }
     }
 
-    function html() {
+    function html(value) {
+      if (value) { elem.innerHTML = value; refresh(); }
       return elem.innerHTML;
     }
+
+    refresh();
 
     return {
       add  : registerAsDarggable,
@@ -97,12 +102,27 @@ var qLayout = (function() {
 })();
 
 
+// Code used for test
 var qlayout;
 $(document).ready(function() {
   qlayout = qLayout.init(document.getElementById('container'));
 
-  var elements = $('#container > div');
-  for (var i=elements.length-1; i >= 0; i--) {
-    qlayout.add(elements[i]);
+  if (localStorage.qlayout) {
+    qlayout.html(localStorage.qlayout)
+  } else {
+    var elements = $('#container > div');
+    for (var i=elements.length-1; i >= 0; i--) {
+      qlayout.add(elements[i]);
+    }
   }
 });
+
+function saveLayout() {
+  localStorage.qlayout = qlayout.html();
+  document.location.reload();
+}
+
+function removeSavedLayoutAndRefresh() {
+  localStorage.removeItem('qlayout');
+  document.location.reload();
+}
