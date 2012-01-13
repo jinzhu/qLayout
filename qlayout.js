@@ -10,9 +10,23 @@ var qLayout = (function() {
   }
 
   function handleDragEnter(e) {
+    doHoverAction(e);
   }
 
   function handleDragLeave(e) {
+    doNormalAction(e);
+  }
+
+  function doHoverAction(e) {
+    e.target.setAttribute("data-qlayout-action", "hover");
+  }
+
+  function doMoveAction(e) {
+    e.target.setAttribute("data-qlayout-action", "move");
+  }
+
+  function doNormalAction(e) {
+    e.target.setAttribute("data-qlayout-action", "normal");
   }
 
   function handleDrop(e) {
@@ -28,6 +42,9 @@ var qLayout = (function() {
 
   function registerAsDarggable(dom) {
     dom.setAttribute('draggable', true);
+
+    dom.addEventListener('mouseover', doHoverAction, false);
+    dom.addEventListener('mouseout', doNormalAction, false);
 
     dom.addEventListener('dragstart', handleDragStart, false);
     dom.addEventListener('dragenter', handleDragEnter, false);
@@ -53,7 +70,7 @@ var qLayout = (function() {
 $(document).ready(function() {
   var elements = $('#container > div');
   var i;
-  for(i=elements.length-1; i > 0; i--) {
+  for(i=elements.length-1; i >= 0; i--) {
     qLayout.registerAsDarggable(elements[i]);
   }
 });
