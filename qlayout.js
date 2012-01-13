@@ -1,4 +1,7 @@
 var qLayout = (function() {
+  ////////////////////////////////////////////////////////////////////////////////
+  // Drag Events
+  ////////////////////////////////////////////////////////////////////////////////
   function handleDragStart(e) {
     this.style.opacity = '0.5';
     e.dataTransfer.start_position = {x: e.pageX, y: e.pageY};
@@ -17,18 +20,6 @@ var qLayout = (function() {
     doNormalAction(e);
   }
 
-  function doHoverAction(e) {
-    e.target.setAttribute("data-qlayout-action", "hover");
-  }
-
-  function doMoveAction(e) {
-    e.target.setAttribute("data-qlayout-action", "move");
-  }
-
-  function doNormalAction(e) {
-    e.target.setAttribute("data-qlayout-action", "normal");
-  }
-
   function handleDrop(e) {
     if (e.stopPropagation) { e.stopPropagation(); } // stops the browser from redirecting.
     return false;
@@ -39,6 +30,27 @@ var qLayout = (function() {
     this.style.left = parseInt(this.style.left) + (e.pageX - start_position.x);
     this.style.top  = parseInt(this.style.top) + (e.pageY - start_position.y);
   }
+
+  ////////////////////////////////////////////////////////////////////////////////
+  // Element Actions
+  ////////////////////////////////////////////////////////////////////////////////
+  function doAction(e, action) {
+    var elem = (e instanceof HTMLElement) ? e : e.target;
+    e.target.setAttribute("data-qlayout-action", action);
+  }
+
+  function doHoverAction(e) {
+    doAction(e, 'hover');
+  }
+
+  function doMoveAction(e) {
+    doAction(e, 'move');
+  }
+
+  function doNormalAction(e) {
+    doAction(e, 'normal');
+  }
+  ////////////////////////////////////////////////////////////////////////////////
 
   function registerAsDarggable(dom) {
     dom.setAttribute('draggable', true);
@@ -70,7 +82,7 @@ var qLayout = (function() {
 $(document).ready(function() {
   var elements = $('#container > div');
   var i;
-  for(i=elements.length-1; i >= 0; i--) {
+  for (i=elements.length-1; i >= 0; i--) {
     qLayout.registerAsDarggable(elements[i]);
   }
 });
