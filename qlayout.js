@@ -71,18 +71,38 @@ var qLayout = (function() {
     dom.style.top       = old_position.top - parent_position.top;
     dom.style.float     = 'none';
     dom.style.position  = 'absolute';
+
+    dom.setAttribute("data-qlayout-element", true);
+  }
+
+  function init(elem) {
+    var children = elem.querySelectorAll('[data-qlayout-element]');
+    for (var i=0; i < children.length; i++) {
+      registerAsDarggable(children);
+    }
+
+    function html() {
+      return elem.innerHTML;
+    }
+
+    return {
+      add  : registerAsDarggable,
+      html : html
+    }
   }
 
   return {
-    registerAsDarggable : registerAsDarggable
+    init : init
   }
 })();
 
 
+var qlayout;
 $(document).ready(function() {
+  qlayout = qLayout.init(document.getElementById('container'));
+
   var elements = $('#container > div');
-  var i;
-  for (i=elements.length-1; i >= 0; i--) {
-    qLayout.registerAsDarggable(elements[i]);
+  for (var i=elements.length-1; i >= 0; i--) {
+    qlayout.add(elements[i]);
   }
 });
