@@ -1,6 +1,7 @@
 var qLayout = (function() {
   function handleDragStart(e) {
     this.style.opacity = '0.5';
+    e.dataTransfer.start_position = {x: e.pageX, y: e.pageY};
   }
 
   function handleDragOver(e) {
@@ -20,8 +21,9 @@ var qLayout = (function() {
   }
 
   function handleDragEnd(e) {
-    this.style.left = parseInt(this.style.left) + e.offsetX;
-    this.style.top  = parseInt(this.style.top) + e.offsetY;
+    var start_position = e.dataTransfer.start_position;
+    this.style.left = parseInt(this.style.left) + (e.pageX - start_position.x);
+    this.style.top  = parseInt(this.style.top) + (e.pageY - start_position.y);
   }
 
   function registerAsDarggable(dom) {
