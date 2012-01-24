@@ -3,7 +3,6 @@ var qLayout = (function() {
   // Drag Events
   ////////////////////////////////////////////////////////////////////////////////
   function handleDragStart(e) {
-    this.style.opacity = '0.5';
     e.dataTransfer.start_position = {x: e.pageX, y: e.pageY};
   }
 
@@ -27,8 +26,8 @@ var qLayout = (function() {
 
   function handleDragEnd(e) {
     var start_position = e.dataTransfer.start_position;
-    this.style.left = parseInt(this.style.left) + (e.pageX - start_position.x);
-    this.style.top  = parseInt(this.style.top) + (e.pageY - start_position.y);
+    this.style.left = parseInt(this.style.left) + (e.pageX - start_position.x) + 'px'
+    this.style.top  = parseInt(this.style.top) + (e.pageY - start_position.y) + 'px';
   }
 
   ////////////////////////////////////////////////////////////////////////////////
@@ -52,7 +51,7 @@ var qLayout = (function() {
   }
   ////////////////////////////////////////////////////////////////////////////////
 
-  function registerAsDarggable(dom) {
+  function registerAsDarggable(dom, parent) {
     dom.setAttribute('draggable', true);
 
     dom.addEventListener('mouseover', doHoverAction, false);
@@ -66,32 +65,34 @@ var qLayout = (function() {
     dom.addEventListener('dragend', handleDragEnd, false);
 
     var old_position    = dom.getBoundingClientRect();
-    var parent_position = document.getElementById('container').getBoundingClientRect();
-    dom.style.left      = old_position.left - parent_position.left;
-    dom.style.top       = old_position.top - parent_position.top;
+    var parent_position = parent.getBoundingClientRect();
+    dom.style.left      = (old_position.left - parent_position.left) + "px";
+    dom.style.top       = (old_position.top - parent_position.top) + "px";
     dom.style.float     = 'none';
     dom.style.position  = 'absolute';
 
     dom.setAttribute("data-qlayout-element", true);
   }
 
-  function init(elem) {
+  function init(root) {
     function refresh() {
-      var children = elem.querySelectorAll('[data-qlayout-element]');
-      for (var i=0; i < children.length; i++) {
-        registerAsDarggable(children[i]);
-      }
+      var children = root.querySelectorAll('[data-qlayout-element]');
+      for (var i=0; i < children.length; i++) { add(children[i]); }
+    }
+
+    function add(elem) {
+      registerAsDarggable(elem, root);
     }
 
     function html(value) {
-      if (value) { elem.innerHTML = value; refresh(); }
-      return elem.innerHTML;
+      if (value) { root.innerHTML = value; refresh(); }
+      return root.innerHTML;
     }
 
     refresh();
 
     return {
-      add  : registerAsDarggable,
+      add  : add,
       html : html
     }
   }
@@ -100,29 +101,3 @@ var qLayout = (function() {
     init : init
   }
 })();
-
-
-// Code used for test
-var qlayout;
-$(document).ready(function() {
-  qlayout = qLayout.init(document.getElementById('container'));
-
-  if (localStorage.qlayout) {
-    qlayout.html(localStorage.qlayout)
-  } else {
-    var elements = $('#container > div');
-    for (var i=elements.length-1; i >= 0; i--) {
-      qlayout.add(elements[i]);
-    }
-  }
-});
-
-function saveLayout() {
-  localStorage.qlayout = qlayout.html();
-  document.location.reload();
-}
-
-function removeSavedLayoutAndRefresh() {
-  localStorage.removeItem('qlayout');
-  document.location.reload();
-}

@@ -12,9 +12,11 @@
       #container .div3 { background-color: #C7F5C9; width:200px; height: 200px; float: right;}
       #container .div4 { background-color: #F2F5C7; width:200px; height: 200px; float: right;}
       #container .div5 { position: absolute; top: 150px; left: 420px; background-color: #F2F500; width:100px; height: 50px; float: right;}
+      [data-qlayout-action="hover"]{ background:url(coordinate_center.png) center center; }
+
       .box_neon_lamp{ background:url(coordinate_center.png) center center; position:absolute; }
-      
-      
+
+
       .box_state_move{ border:2px #666 dotted; opacity:.5;}
       .drag_target_hover/*,#container .div1:hover*/{ border:4px #666 dashed; background-color:#999;  }
 
@@ -32,20 +34,45 @@
     </div>
 
     <div id="container">
-      <div class="box div1">1</div>
-      <div class="box div2" data-qlayout-action="hover">2</div>
-      <div class="box div3" data-qlayout-action="normal">3</div>
-      <div class="box div4">4</div>
+      <div class="div1">1</div>
+      <div class="div2" data-qlayout-action="hover">2</div>
+      <div class="div3" data-qlayout-action="normal">3</div>
+      <div class="div4">4</div>
       <div class="widget div5" data-qlayout-action="hover">one line text</div>
-      
-      
+
+
     </div>
-    
+
     <p></p>
     <div class="box_neon_lamp"><!-- centered coordinate --></div>
     <div class="widget box_state_move" >drag start,move</div>
     <div class="drag_target_hover" >box_drag_target_hover</div>
-    
-    
- </body>
+
+    <script>
+      // Code used for test
+      var qlayout;
+      $(document).ready(function() {
+        qlayout = qLayout.init(document.getElementById('container'));
+
+        if (localStorage.qlayout) {
+          qlayout.html(localStorage.qlayout)
+          } else {
+          var elements = $('#container > div');
+          for (var i=elements.length-1; i >= 0; i--) {
+            qlayout.add(elements[i]);
+          }
+        }
+      });
+
+      function saveLayout() {
+        localStorage.qlayout = qlayout.html();
+        document.location.reload();
+      }
+
+      function removeSavedLayoutAndRefresh() {
+        localStorage.removeItem('qlayout');
+        document.location.reload();
+      }
+    </script>
+  </body>
 </html>
